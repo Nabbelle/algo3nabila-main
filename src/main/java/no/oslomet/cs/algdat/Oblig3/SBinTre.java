@@ -4,29 +4,30 @@ package no.oslomet.cs.algdat.Oblig3;
 import java.util.*;
 
 public class SBinTre<T> {
-    private T verdi;                   // nodens verdi
-    private Node<T> venstre, høyre;    // venstre og høyre barn
-    private Node<T> forelder;          // forelder
+    private static final class Node<T> {
+        private T verdi;                   // nodens verdi
+        private Node<T> venstre, høyre;    // venstre og høyre barn
+        private Node<T> forelder;          // forelder
 
-    // konstruktør
-    private Node(T verdi, Node<T> v, Node<T> h, Node<T> forelder) {
-        this.verdi = verdi;
-        venstre = v;
-        høyre = h;
-        this.forelder = forelder;
-    }
+        // konstruktør
+        private Node(T verdi, Node<T> v, Node<T> h, Node<T> forelder) {
+            this.verdi = verdi;
+            venstre = v;
+            høyre = h;
+            this.forelder = forelder;
+        }
 
-    private Node(T verdi, Node<T> forelder)  // konstruktør
-    {
-        this(verdi, null, null, forelder);
-    }
+        private Node(T verdi, Node<T> forelder)  // konstruktør
+        {
+            this(verdi, null, null, forelder);
+        }
 
-    @Override
-    public String toString() {
-        return "" + verdi;
-    }
+        @Override
+        public String toString() {
+            return "" + verdi;
+        }
 
-} // class Node
+    } // class Node
 
     private Node<T> rot;                            // peker til rotnoden
     private int antall;                             // antall noder
@@ -62,27 +63,6 @@ public class SBinTre<T> {
         return antall;
     }
 
-    public String toStringPostOrder() {
-        if (tom()) return "[]";
-
-        StringJoiner s = new StringJoiner(", ", "[", "]");
-
-        Node<T> p = førstePostorden(rot); // går til den første i postorden
-        while (p != null) {
-            s.add(p.verdi.toString());
-            p = nestePostorden(p);
-        }
-
-        return s.toString();
-    }
-
-    public boolean tom() {
-        return antall == 0;
-    }
-
-    public int antall() {
-        return antall;
-    }
 
     public String toStringPostOrder() {
         if (tom()) return "[]";
@@ -169,17 +149,16 @@ public class SBinTre<T> {
     private static <T> Node<T> nestePostorden(Node<T> p) {
 
 
-        Node<T> parent=p.forelder;          //oppretter p sin foreldereNode
+        Node<T> parent = p.forelder;          //oppretter p sin foreldereNode
 
-        if(parent == null){
+        if (parent == null) {
             return null;                    //Hvis parent er null så returneres null
         }
 
-        if(parent.høyrebarn==p || parent.høyrebarn==null){
+        if (parent.høyre == p || parent.høyre == null) {
             return parent; //returnerer parent hvis parent sin høyre er p eller parent sin høyre er null
-        }
-        else{
-            return førstePostorden(parent.høyrebarn); // kaller på førstepostorden
+        } else {
+            return førstePostorden(parent.høyre); // kaller på førstepostorden
         }
 
         //throw new UnsupportedOperationException("Ikke kodet ennå!");
@@ -188,57 +167,37 @@ public class SBinTre<T> {
     public void postorden(Oppgave<? super T> oppgave) {
 
 
-        Node<T> p= rot;                                 //setter p til å være roten
+        Node<T> p = rot;                                 //setter p til å være roten
 
         Node<T> forst = førstePostorden(p);             // kaller på førstePostorden for p
 
         oppgave.utførOppgave(forst.verdi);
-        while (forst.forelder != null){
-            forst= nestePostorden(forst);
+        while (forst.forelder != null) {
+            forst = nestePostorden(forst);
             oppgave.utførOppgave(Objects.requireNonNull(forst.verdi));
         }
-
-
 
 
         //throw new UnsupportedOperationException("Ikke kodet ennå!");
     }
 
-    public void postordenRecursive(Oppgave<? super T> oppgave) {
-
-        postordenRecursive(rot, oppgave);
-
-
-    }
-
     private void postordenRecursive(Node<T> p, Oppgave<? super T> oppgave) {
 
 
-
-        if (p==null){
+        if (p == null) {
             return;                              //returnerer hvis p er null
         }
 
-        postordenRecursive(p.venstrebarn, oppgave);                 //rekursivt kall for p sitt venstrebarn
+        postordenRecursive(p.venstre, oppgave);                 //rekursivt kall for p sitt venstrebarn
 
-        postordenRecursive(p.høyrebarn,oppgave);                    //rekursivt kall for p sitt høyrebarn
+        postordenRecursive(p.høyre, oppgave);                    //rekursivt kall for p sitt høyrebarn
 
         oppgave.utførOppgave(p.verdi);
 
-
-
-
+    }
 
     public void postordenRecursive(Oppgave<? super T> oppgave) {
         postordenRecursive(rot, oppgave);
-    }
-
-    private void postordenRecursive(Node<T> p, Oppgave<? super T> oppgave) {
-        if (p == null) return;
-
-        postordenRecursive(p.venstre, oppgave);
-        postordenRecursive(p.høyre, oppgave);
-        oppgave.utførOppgave(p.verdi);
     }
 
     public ArrayList<T> serialize() {
